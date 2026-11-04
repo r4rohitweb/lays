@@ -1,0 +1,16 @@
+.inside-stage{background:radial-gradient(ellipse at 52% 45%,#f21720 0%,#c9000b 46%,#710009 100%)}
+.fallback-back{background:linear-gradient(100deg,#75000b,#e62323 30%,#fb4733 65%,#92000d)}
+.fallback-bag .fallback-back{padding:0;background:transparent;overflow:hidden;clip-path:none}
+.fallback-bag .fallback-back img{width:100%;height:100%;object-fit:contain;filter:none}
+.inside-stage:after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,transparent 25%,#35000677 100%);z-index:1;opacity:var(--storm,0)}
+.inside-number,.inside-kicker,.inside-chapters{opacity:calc(1 - var(--storm,0));transition:opacity .15s}
+.flying-chip{background:radial-gradient(ellipse at 28% 15%,#ff9d4466,transparent 42%),repeating-linear-gradient(96deg,transparent 0 4px,#ff754233 5px,transparent 6px 9px),linear-gradient(135deg,#ff4a1d,#f0140c 45%,#c40005 78%,#7f0009);border-radius:48% 52% 32% 68%/36% 42% 58% 64%;box-shadow:inset 2px 3px 6px #ff9b4866,inset -5px -3px 9px #77000699,4px 8px 10px #59000022}
+.flying-chip:nth-child(3n){border-radius:25% 75% 42% 58%/68% 27% 73% 32%;clip-path:polygon(8% 4%,83% 13%,100% 49%,72% 98%,22% 88%,0 46%)}
+.flying-chip:nth-child(3n + 1){border-radius:60% 40% 61% 39%/30% 58% 42% 70%;background:radial-gradient(ellipse at 45% 25%,#ff5d23,#ed0b0b 62%,#9c000a)}
+.flying-chip:after{content:"";position:absolute;inset:10%;border-radius:inherit;background:radial-gradient(circle at 20% 40%,#65000055 0 1px,transparent 2px),radial-gradient(circle at 65% 70%,#ffb24a55 0 1px,transparent 2px),linear-gradient(110deg,transparent 35%,#ff782b33 48%,#78000033 54%,transparent 68%)}
+.storm-active .inside-bottom{left:5%;right:5%;bottom:35px}
+.storm-active .inside-bottom>span:first-child,.storm-active .inside-bottom>span:last-child{opacity:0}
+.storm-active #spin-speed{position:absolute;left:0;bottom:0;font-size:9px;letter-spacing:1px;color:#fff5dc}
+.storm-active .inside-chapters{pointer-events:none}
+@media(max-width:760px){.flying-chip{max-width:85px;max-height:110px}.storm-active #spin-speed{font-size:7px}.storm-active .inside-bottom{bottom:30px}}
+@media(prefers-reduced-motion:reduce){.flying-chip{display:none}}

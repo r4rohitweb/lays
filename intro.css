@@ -1,0 +1,18 @@
+.intro{background:radial-gradient(ellipse at 50% 48%,#b00660 0%,#94044e 42%,#740033 100%);isolation:isolate}
+.intro-chips{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.intro-yellow{position:absolute;inset:0;background:radial-gradient(circle at center,#fff178 0,#f9d527 40%,#eac414 100%);opacity:var(--intro-reveal,0);z-index:0}
+.intro-yellow:after{content:"";position:absolute;inset:-100%;background:repeating-conic-gradient(from 0deg,#fff5 0deg 5deg,transparent 5deg 12deg);mask-image:radial-gradient(circle,transparent 0%,#000 30%,transparent 65%);transform:scale(.2);opacity:0}
+.logo-reveal .intro-yellow:after{animation:intro-sunburst .75s ease-out both}
+.intro-logo{position:absolute;left:50%;top:50%;width:190px;height:190px;display:grid;place-items:center;transform:translate(-50%,-50%) rotateY(90deg) scale(.6);opacity:0;z-index:3;pointer-events:none}
+.intro-logo .brand-mark{transform:rotate(-8deg) scale(3.6)}
+.logo-reveal .intro-logo{animation:intro-logo-reveal .65s cubic-bezier(.2,.8,.2,1) .08s both}
+.intro .skip-intro{top:32px;right:3%;font-size:9px;padding:11px 17px;border-color:#fff8;z-index:5}
+.intro-label,.intro-progress{z-index:5;color:#fff5dc}
+.intro-label{font-size:7px;letter-spacing:1.8px}
+.intro-progress{font-size:24px}
+.intro-progress>span{font-size:10px}
+.intro.logo-reveal{color:#4b360e}.logo-reveal .intro-label,.logo-reveal .intro-progress{color:#4b360e}.logo-reveal .skip-intro{border-color:#4b360e80}
+@keyframes intro-sunburst{0%{opacity:0;transform:scale(.15) rotate(0deg)}35%{opacity:.8}100%{opacity:0;transform:scale(1.3) rotate(12deg)}}
+@keyframes intro-logo-reveal{0%{opacity:0;transform:translate(-50%,-50%) rotateY(90deg) scale(.6)}70%{opacity:1;transform:translate(-50%,-50%) rotateY(-12deg) scale(1.08)}100%{opacity:1;transform:translate(-50%,-50%) rotateY(0) scale(1)}}
+@media(max-width:760px){.intro .skip-intro{top:25px;right:5%;font-size:8px}.intro-label{left:5%;font-size:6px;max-width:65%}.intro-progress{right:5%;font-size:24px}.intro-logo .brand-mark{transform:rotate(-8deg) scale(2.8)}}
+@media(prefers-reduced-motion:reduce){.intro{display:none}}
