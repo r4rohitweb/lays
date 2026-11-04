@@ -1,52 +1,76 @@
-# Lay’s Crunch Lab
+# Lay’s Crunch Lab — React
 
-An independent, noncommercial concept website rebuilt around the supplied video’s motion and page sequence. Built with HTML, CSS, JavaScript, and a custom WebGL pouch renderer. No dependencies or build step.
+The existing Crunch Lab website converted to React 19 and Vite, preserving its layout, local product imagery, CSS, and animation timing. All nine flavors, authentic packet backs, scroll scenes, shop effects, three-pack builder, concept basket, and footer remain included.
 
-## Open
+## Development
 
-Start Apache in XAMPP, then visit http://localhost/testing/lays/.
+Requires Node.js 20.19+ or 22.12+.
 
-## Interactions
+```powershell
+npm.cmd install
+npm.cmd run dev
+```
 
-- Skippable/replayable magenta intro with swirling ridged potato chips, a central spinning chip, and a yellow logo reveal.
-- Nine-pack perspective carousel with autoplay, arrows, keyboard controls, swipe/drag, color changes, and concentric backgrounds. Scrolling the opening section advances the lineup.
-- A pinned four-chapter scene driven by native scroll position. Forward and reverse scrolling rotate a curved, textured Flamin’ Hot pouch and build into a full-screen red chip storm with a centered pack, depth blur, and a live spin-speed readout. Chapter buttons navigate the sequence. At the end, the Flamin’ Hot packet travels with the scroll into its matching shop card; scrolling back reverses the transition.
-- Pointer-reactive shop cards with elastic bag presses, cream labels expanding left from black circular add controls, green remove icons, synchronized builder selection, flying-bag feedback, and a floating three-pack tray. Completed bundles animate toward the basket.
-- A three-pack builder with falling bags, three different flavors, individual removal, a three-bag limit, and a concept basket persisted in localStorage.
-- A continuously looping hanging-pack rail with seamless wrapping during autoplay, dragging, touch scrolling, and arrow navigation. Pauses on hover or keyboard focus, includes a pause control, and respects reduced-motion preferences. Clicking or tapping a packet flips it to its original back photograph; clicking again returns to the front. Flip state stays synchronized through loop wrapping.
-- Q&A accordions, mobile navigation, and opt-in synthesized interaction sounds.
-- A dark red newsletter ending with a floating Flamin’ Hot pack, three faint orbital rings with animated chillies and chips, outlined STAY CRUNCHY marquee, Explore/Help columns, credits, and back-to-top controls. The email form validates locally and creates no subscription.
-- A full-width wooden-table scene with a transparent glass bowl, 42 varied golden chips with gravity-driven falls, tumbling, landing bounces, contact shadows, bag compression, pointer-reactive glass highlights, a pinned scene where scrolling lifts the packet from the table, tilts it over the bowl, then pours, with the sequence reversing on upward scroll, a progress bar, and a restart control. Reduced-motion mode shows the filled bowl without animation.
-- Reduced-motion mode disables autoplay, particles, spinning, and the intro. CSS perspective provides a fallback when WebGL is unavailable.
+Open the local address printed by Vite, normally http://127.0.0.1:5173/. The `.cmd` form works in PowerShell when its execution policy blocks `npm.ps1`; `npm` also works in other shells.
 
-The basket is a demonstration: there is no checkout, payment processing, or order backend.
+## Production and XAMPP
 
-## Reference fidelity
+```powershell
+npm.cmd run build
+```
 
-The page recreates the principal motion patterns visible in the supplied video. The video’s nine-flavor lineup is included, with locally stored product images. The original source code and 3D models were not supplied. This implementation uses a custom procedural pouch mesh, and an original Flamin’ Hot 2.5 oz reverse-side packet photograph matching UPC 028400768764. The genuine back photograph comes from the Gopuff product gallery; the front comes from PepsiCo SmartLabel. No video of the reference is embedded as website content.
+The static production site is generated in `dist/`. With XAMPP Apache running, the included `.htaccess` serves that build at the existing address, http://localhost/testing/lays/. Rebuild after source changes to update the Apache version. The build is also directly accessible at http://localhost/testing/lays/dist/.
 
-## Files
+For Vite’s production preview, run `npm.cmd run preview`. To deploy elsewhere, upload the contents of `dist/`; relative asset paths support hosting under a subdirectory.
 
-- `index.html`: page structure, intro, sections, and basket dialog.
-- `styles.css`, `flavors.css`, and `storm.css`: responsive composition, nine-flavor layouts, perspective, animation, and reduced-motion styles.
-- `app.js`: carousel, scroll choreography, particles, builder, basket, rail, navigation, and sound.
-- `footer.css` and `footer.js`: reference-style newsletter/footer, local form feedback, and dark header state.
-- `shop-effects.css`: shop-card hover, press, add confirmation, and floating three-pack tray styles.
-- `packet-flight.css` and `packet-flight.js`: scroll-driven packet handoff from the red scene into the shop grid.
-- `pouch.js`: WebGL shaders, silhouette-aware curved mesh, lighting, and the original packet reverse texture.
-- `intro.css` and `intro.js`: animated chip intro, procedural chip textures, and yellow logo transition.
-- `bowl.css` and `bowl.js`: responsive glass-bowl scene and scroll-controlled chip-pouring animation.
-- `credits.html`: product image attribution.
-- `rail-flip.css`: front/back packet faces and persistent flip transitions.
-- `assets/rail/`: matched front/back photographs for the hanging lineup, credited to Gopuff.
-- `assets/`: local product textures and favicon. Google Fonts loads remotely with local font fallbacks.
+## Source layout
+
+- `src/App.jsx`: composes the page and owns notification state.
+- `src/components/`: React sections, reusable product images, builder, basket dialog, and floating tray.
+- `src/hooks/useThreePack.js`: React selection/basket state, three-distinct-flavor rule, removal, basket limits, and localStorage persistence.
+- `src/hooks/useExperience.js`: mounts the animation engines and disposes them on unmount or hot reload.
+- `src/animations/`: carousel/scroll choreography, WebGL pouch renderer, intro, packet handoff, bowl simulation, and footer visibility. Animation frames, timers, listeners, observers, temporary elements, and WebGL resources are cleaned up for React Strict Mode.
+- `src/data/flavors.js`: the shared nine-flavor catalog.
+- `src/styles/`: the original stylesheets, imported in their original order.
+- `public/assets/`: original product images, matched front/back rail photographs, and favicon; copied to `dist/assets/` by Vite.
+- `public/credits.html`: image source attribution, copied to the production build.
+- `scripts/browser-check.cjs`: Chrome browser regression checks.
+
+React renders the page structure, product lists, selection controls, basket, newsletter feedback, and notifications. The canvas/WebGL and continuous scroll animations run inside a lifecycle-managed effect so their transforms remain smooth without rerendering every frame. The project has no global script entry points or duplicate vanilla application.
+
+## Preserved interactions
+
+- Skippable and replayable magenta chip intro with a yellow logo reveal.
+- Nine-flavor perspective carousel with arrows, dots, swipe/drag, keyboard controls, autoplay, and scroll-driven selection.
+- Pinned, reversible four-chapter WebGL pouch scene with the real Flamin’ Hot reverse image, chip storm, and scroll-controlled packet handoff into the shop.
+- Tilting shop cards, elastic bag presses, expanding add controls, green remove buttons, flying bags, and a floating selection tray.
+- Three-pack builder requiring three different flavors; individual removal; concept basket persisted on the device.
+- Seamlessly looping hanging rail with paperclips, dragging, arrow navigation, pause control, and synchronized authentic packet-back flips.
+- Full-width wooden-table scene: the packet starts on the table, lifts and tilts as you scroll, and pours 42 tumbling chips into a transparent glass bowl. Reverse scrolling rewinds the sequence.
+- Q&A accordions, responsive navigation, opt-in synthesized sound, and reduced-motion alternatives.
+- Red newsletter/footer with three faint ingredient orbits, animated chillies/chips, floating packet, and STAY CRUNCHY marquee.
+
+The basket and newsletter are local demonstrations. No payments, orders, or subscriptions are created. The previously removed store-locator and social links remain removed.
 
 ## Verification
 
-Run `node scripts/browser-check.cjs` with XAMPP running. Uses installed Chrome and Node’s built-in WebSocket, with no npm dependencies. It checks image loading, carousel selection, WebGL initialization, pinned forward/reverse scroll chapters, chip storm, builder limits/removal/unique flavors, basket persistence and Escape, rail controls and original front/back flips, Q&A, mobile navigation, reduced motion, JavaScript errors, and horizontal overflow at 1440/768/390/320px. The test uses software WebGL to work on machines without a dedicated GPU.
+With Apache running and a current production build:
 
-Screenshots and the isolated Chrome profile are saved to ignored `.qa/`. The previous site files are preserved in `.qa/previous-version/`.
+```powershell
+npm.cmd test
+```
 
-## Imagery
+To test the Vite development server instead:
 
-PNGimg images are provided under CC BY-NC 4.0; ClipartMax and PNGkey images are used for noncommercial demonstration. The Barbecue, Flamin’ Hot, All Dressed, Sweet Southern Heat Barbecue, and Bacon Grilled Cheese pack images come from PepsiCo SmartLabel. Source links are in `credits.html`. Product trademarks and imagery belong to their respective owners. This website is not affiliated with Lay’s or PepsiCo.
+```powershell
+$env:SITE_URL = 'http://127.0.0.1:5173/'
+npm.cmd test
+```
+
+The checks use installed Google Chrome and Node’s built-in WebSocket. They cover local image loading, WebGL initialization, forward/reverse scroll scenes, the bowl pour and rewind, all builder constraints, basket persistence and Escape, original packet backs, looping rail, footer orbits, newsletter feedback, mobile navigation, reduced motion, JavaScript errors, and horizontal overflow at 1440/768/390/320px.
+
+Screenshots and the isolated browser profile are stored in ignored `.qa/`. The pre-conversion source and reference screenshots are preserved in `.qa/pre-react/`; earlier references and backups remain in `.qa/`.
+
+## Imagery and reference
+
+This is an independent, noncommercial design concept inspired by Lay’s and the supplied reference video. Product imagery and trademarks belong to their respective owners. Sources and image-license details are in `public/credits.html`. Google Fonts loads remotely with local font fallbacks. No reference video is embedded as page content.

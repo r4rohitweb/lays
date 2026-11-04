@@ -1,0 +1,6 @@
+# XAMPP serves the production React build at the existing project URL.
+DirectoryIndex dist/index.html
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ dist/$1 [L]

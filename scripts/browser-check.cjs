@@ -41,7 +41,7 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
     await send('Network.enable');
     await send('Network.setCacheDisabled', { cacheDisabled: true });
     await send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 1000, deviceScaleFactor: 1, mobile: false });
-    await send('Page.navigate', { url: 'http://localhost/testing/lays/' });
+    await send('Page.navigate', { url: process.env.SITE_URL || 'http://localhost/testing/lays/' });
     await send('Page.bringToFront');
     await delay(2600);
     await evaluate('document.fonts.ready.then(() => true)');
@@ -74,6 +74,10 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
     assert.equal(await evaluate(`document.querySelector('#add-bundle').disabled`), false);
     await evaluate(`document.querySelector('[data-pick="bbq"]').click()`);
     assert.equal(await evaluate(`document.querySelectorAll('.pack-slot.filled').length`), 3, 'Cannot overfill the box');
+    // Flush a paint so headless Chrome advances the CSS color transition.
+    await send('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
+    await delay(400);
+    assert.equal(await evaluate(`getComputedStyle(document.querySelector('[data-add="classic"] .add-symbol')).backgroundColor`), 'rgb(22, 133, 44)', 'Selected card keeps its green remove control');
     await screenshot('shop');
     await evaluate(`document.querySelector('#builder').scrollIntoView({behavior:'instant'})`);
     await delay(700); await screenshot('builder');
@@ -83,7 +87,8 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
     assert.equal(await evaluate(`document.querySelector('[data-pick="sour"]').disabled`), true, 'Selected flavors cannot be repeated');
     await evaluate(`document.querySelector('[data-pick="sour"]').click()`);
     assert.equal(await evaluate(`document.querySelectorAll('.pack-slot.filled').length`), 2, 'Duplicate selection does not fill another slot');
-    await evaluate(`document.querySelector('[data-pick="bacon"]').click(); document.querySelector('#add-bundle').click()`);
+    await evaluate(`document.querySelector('[data-pick="bacon"]').click()`);
+    await evaluate(`document.querySelector('#add-bundle').click()`);
     assert.equal(await evaluate(`document.querySelector('#basket-count').textContent`), '3');
     assert.equal(await evaluate(`document.querySelectorAll('.pack-slot.filled').length`), 0, 'Bundle resets after adding');
     assert.equal(await evaluate(`document.querySelectorAll('[data-pick]:disabled').length`), 0, 'All flavors are enabled for the next pack');
@@ -125,6 +130,28 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
     assert.equal(await evaluate(`document.querySelector('[data-rail-flavor="dressed"] .rail-back').getAttribute('aria-hidden')`), 'false', 'Back image is exposed to assistive technology');
     await evaluate(`document.querySelector('.rail-item:not([aria-hidden]) [data-rail-flavor="dressed"]').click()`);
     assert.equal(await evaluate(`document.querySelectorAll('[data-rail-flavor="dressed"].is-flipped').length`), 0, 'Second click returns every copy to the front');
+    for (const fraction of [0, .2, .45, .75, 1, 0]) {
+      await evaluate(`window.scrollTo({top:document.querySelector('#crunch-table').offsetTop+(document.querySelector('#crunch-table').offsetHeight-document.querySelector('.crunch-table-stage').offsetHeight)*${fraction},behavior:'instant'})`);
+      await delay(800);
+      const pour = await evaluate(`({progress:parseFloat(document.querySelector('.pour-progress>span').style.width),chips:[...document.querySelectorAll('.bowl-chip')].filter(chip=>Number(chip.style.opacity)>0).length,pack:document.querySelector('.pour-pack').style.transform,top:document.querySelector('.crunch-table-stage').getBoundingClientRect().top})`);
+      assert(Math.abs(pour.progress - fraction * 100) < 1, 'Pour follows forward and reverse scrolling');
+      assert(Math.abs(pour.top) < 2, 'Bowl scene stays pinned');
+      if (fraction === 0) assert.equal(pour.chips, 0, 'Rewinding empties the bowl');
+      if (fraction === .2) assert.equal(pour.chips, 0, 'Bag lifts before pouring');
+      if (fraction === 1) {
+        assert.equal(pour.chips, 42, 'All chips land in the transparent bowl');
+        await screenshot('bowl-filled');
+      }
+    }
+    await screenshot('bowl-table');
+    await evaluate(`document.querySelector('#join').scrollIntoView({behavior:'instant'})`);
+    await delay(400);
+    assert.equal(await evaluate(`document.querySelectorAll('.flavor-orbit').length`), 3, 'Footer keeps three ingredient orbits');
+    assert.equal(await evaluate(`document.querySelectorAll('.orbit-ingredient').length`), 6);
+    assert.equal(await evaluate(`document.querySelector('.header').classList.contains('on-footer')`), true);
+    await screenshot('newsletter');
+    await evaluate(`document.querySelector('#newsletter-email').value='hello@example.com';document.querySelector('.newsletter-form').requestSubmit()`);
+    assert.match(await evaluate(`document.querySelector('.newsletter-status').textContent`), /NO SUBSCRIPTION/);
     await evaluate(`document.querySelector('.questions summary').click()`);
     assert.equal(await evaluate(`document.querySelector('.questions details').open`), true);
     for (const width of [768, 390, 320]) {
@@ -146,11 +173,14 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
     await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
     assert.equal(await evaluate(`getComputedStyle(document.querySelector('.carousel-pack img')).animationName`), 'none');
     assert.equal(await evaluate(`getComputedStyle(document.querySelector('.flying-chip')).display`), 'none');
+    await evaluate(`document.querySelector('#crunch-table').scrollIntoView({behavior:'instant'})`);
+    await delay(300);
+    assert.equal(await evaluate(`[...document.querySelectorAll('.bowl-chip')].filter(chip=>Number(chip.style.opacity)>0).length`), 42, 'Reduced motion shows a filled bowl');
     await send('Page.reload'); await delay(1600);
     assert.equal(await evaluate(`document.querySelector('#basket-count').textContent`), '3', 'Basket survives reload');
     await evaluate(`document.querySelector('#clear-basket').click()`);
     assert.deepEqual(errors, [], 'No uncaught JavaScript errors');
-    console.log('PASS: all images; desktop and 768/390/320px layouts; carousel; WebGL; pinned forward/reverse scroll chapters; chip storm; three-pack limits/removal/unique flavors; basket/persistence/Escape; rail; Q&A; mobile navigation; reduced motion; no JavaScript errors.');
+    console.log('PASS: all images; desktop and 768/390/320px layouts; carousel; WebGL; pinned forward/reverse scroll chapters; chip storm; three-pack limits/removal/unique flavors; basket/persistence/Escape; original packet backs and looping rail; scroll-driven bowl pour/rewind; footer orbits and newsletter; Q&A; mobile navigation; reduced motion; no JavaScript errors.');
     await send('Browser.close');
   } finally {
     if (ws) ws.close();
